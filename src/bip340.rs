@@ -74,8 +74,8 @@ impl Bip340Secret {
     pub fn sign(&self, msg: [u8; 32]) -> SsiSig {
         let msg = Message::from_digest(msg);
         let keypair = Keypair::from_secret_key(SECP256K1, &self.0);
-        let sig = SECP256K1.sign_schnorr(&msg, &keypair);
-        SsiSig::from(sig.serialize())
+        let sig = SECP256K1.sign_schnorr(msg.as_ref(), &keypair);
+        SsiSig::from(sig.to_byte_array())
     }
 }
 
@@ -84,7 +84,7 @@ impl SsiPub {
         let sig = Signature::from_slice(sig.as_slice()).map_err(|_| InvalidSig::InvalidData)?;
         let msg = Message::from_digest(msg);
         let pk = XOnlyPublicKey::try_from(self)?;
-        sig.verify(&msg, &pk).map_err(|_| InvalidSig::InvalidSig)
+        sig.verify(msg.as_ref(), &pk).map_err(|_| InvalidSig::InvalidSig)
     }
 }
 

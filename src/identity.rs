@@ -100,8 +100,8 @@ impl Ssi {
 
     pub fn to_message(&self) -> [u8; 32] {
         let s = self.to_string();
-        let (mut s, _) = s.rsplit_once("sig=").unwrap_or_else(|| (s.as_str(), ""));
-        s = s.trim_end_matches(&['&', '?']);
+        let (mut s, _) = s.rsplit_once("sig=").unwrap_or((s.as_str(), ""));
+        s = s.trim_end_matches(['&', '?']);
         let msg = Sha256::digest(s);
         Sha256::digest(msg).into()
     }
@@ -122,7 +122,7 @@ impl Ssi {
 pub enum SsiParseError {
     #[from]
     #[display(inner)]
-    InvalidUri(fluent_uri::ParseError),
+    InvalidUri(fluent_uri::error::ParseError),
     /// SSI must be a valid URI containing schema part.
     NoUriScheme,
     /// SSI must start with 'ssi:' prefix (URI scheme).
@@ -160,7 +160,7 @@ impl FromStr for Ssi {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let uri = Uri::parse(s)?;
 
-        let scheme = uri.scheme().ok_or(SsiParseError::NoUriScheme)?;
+        let scheme = uri.scheme();
         if scheme.as_str() != "ssi" {
             return Err(SsiParseError::InvalidScheme(scheme.to_string()));
         }
@@ -214,7 +214,7 @@ impl Display for Ssi {
 
         for uid in &self.uids {
             let uid = uid.to_string().replace(['<', '>'], "");
-            write!(f, "{sep}uid={}", utf8_percent_encode(&uid, SET).to_string().replace(' ', "+"),)?;
+            write!(f, "{sep}uid={}", utf8_percent_encode(&uid, SET).to_string().replace(' ', "+"), )?;
             sep = '&';
         }
 
