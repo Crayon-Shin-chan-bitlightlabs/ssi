@@ -23,15 +23,15 @@ use std::str::FromStr;
 
 use aes_gcm::aead::{Aead, Nonce, OsRng};
 use aes_gcm::{AeadCore, Aes256Gcm, KeyInit};
-use amplify::confinement::{Confined, SmallOrdMap, U64 as U64MAX};
 use amplify::Bytes32;
+use amplify::confinement::{Confined, SmallOrdMap, U64 as U64MAX};
 use armor::{ArmorHeader, ArmorParseError, AsciiArmor};
-use ec25519::{edwards25519, KeyPair, Seed};
+use ec25519::{KeyPair, Seed, edwards25519};
 use rand::random;
 use sha2::{Digest, Sha256};
 use strict_encoding::{StrictDeserialize, StrictSerialize};
 
-use crate::{Algo, InvalidPubkey, SsiPair, SsiPub, LIB_NAME_SSI};
+use crate::{Algo, InvalidPubkey, LIB_NAME_SSI, SsiPair, SsiPub};
 
 #[derive(Copy, Clone, Debug, Display, Error)]
 pub enum EncryptionError {
@@ -64,7 +64,6 @@ pub struct SymmetricKey(
 impl AsRef<[u8]> for SymmetricKey {
     fn as_ref(&self) -> &[u8] { self.0.as_ref() }
 }
-
 
 impl SymmetricKey {
     pub fn random() -> Self {
@@ -120,7 +119,7 @@ impl FromStr for Encrypted {
 impl Encrypted {
     pub fn encrypt(
         source: Vec<u8>,
-        receivers: impl IntoIterator<Item=SsiPub>,
+        receivers: impl IntoIterator<Item = SsiPub>,
     ) -> Result<Self, EncryptionError> {
         let key = SymmetricKey::random();
         let mut keys = bmap![];

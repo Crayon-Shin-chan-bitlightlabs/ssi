@@ -48,7 +48,9 @@ pub enum Algo {
 
 impl StrictType for Algo {
     const STRICT_LIB_NAME: &'static str = LIB_NAME_SSI;
-    fn strict_name() -> Option<TypeName> { Some(tn!("Algo")) }
+    fn strict_name() -> Option<TypeName> {
+        Some(tn!("Algo"))
+    }
 }
 impl StrictProduct for Algo {}
 impl StrictTuple for Algo {
@@ -85,7 +87,9 @@ impl FromStr for Algo {
 }
 
 impl From<Algo> for u8 {
-    fn from(algo: Algo) -> Self { algo.to_u8() }
+    fn from(algo: Algo) -> Self {
+        algo.to_u8()
+    }
 }
 
 impl From<u8> for Algo {
@@ -121,7 +125,9 @@ pub enum Chain {
 
 impl StrictType for Chain {
     const STRICT_LIB_NAME: &'static str = LIB_NAME_SSI;
-    fn strict_name() -> Option<TypeName> { Some(tn!("Chain")) }
+    fn strict_name() -> Option<TypeName> {
+        Some(tn!("Chain"))
+    }
 }
 impl StrictProduct for Chain {}
 impl StrictTuple for Chain {
@@ -158,7 +164,9 @@ impl FromStr for Chain {
 }
 
 impl From<Chain> for u8 {
-    fn from(chain: Chain) -> Self { chain.to_u8() }
+    fn from(chain: Chain) -> Self {
+        chain.to_u8()
+    }
 }
 
 impl From<u8> for Chain {
@@ -197,13 +205,17 @@ impl DisplayBaid64 for SsiPub {
     const EMBED_CHECKSUM: bool = false;
     const MNEMONIC: bool = false;
 
-    fn to_baid64_payload(&self) -> [u8; 32] { <[u8; 32]>::from(*self) }
+    fn to_baid64_payload(&self) -> [u8; 32] {
+        <[u8; 32]>::from(*self)
+    }
 }
 
 impl FromBaid64Str for SsiPub {}
 
 impl From<SsiPub> for [u8; 32] {
-    fn from(ssi: SsiPub) -> Self { ssi.to_byte_array() }
+    fn from(ssi: SsiPub) -> Self {
+        ssi.to_byte_array()
+    }
 }
 
 impl From<[u8; 32]> for SsiPub {
@@ -255,7 +267,9 @@ impl Display for SsiPub {
 
 impl FromStr for SsiPub {
     type Err = Baid64ParseError;
-    fn from_str(s: &str) -> Result<Self, Self::Err> { Self::from_baid64_str(s) }
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::from_baid64_str(s)
+    }
 }
 
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, From)]
@@ -264,7 +278,9 @@ impl FromStr for SsiPub {
 pub struct SsiSig(#[from([u8; 64])] Bytes64);
 
 impl SsiSig {
-    pub fn as_slice(&self) -> &[u8] { self.0.as_slice() }
+    pub fn as_slice(&self) -> &[u8] {
+        self.0.as_slice()
+    }
 }
 
 impl DisplayBaid64<64> for SsiSig {
@@ -274,18 +290,24 @@ impl DisplayBaid64<64> for SsiSig {
     const EMBED_CHECKSUM: bool = false;
     const MNEMONIC: bool = false;
 
-    fn to_baid64_payload(&self) -> [u8; 64] { self.0.to_byte_array() }
+    fn to_baid64_payload(&self) -> [u8; 64] {
+        self.0.to_byte_array()
+    }
 }
 
 impl FromBaid64Str<64> for SsiSig {}
 
 impl FromStr for SsiSig {
     type Err = Baid64ParseError;
-    fn from_str(s: &str) -> Result<Self, Self::Err> { Self::from_baid64_str(s) }
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::from_baid64_str(s)
+    }
 }
 
 impl Display for SsiSig {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result { self.fmt_baid64(f) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        self.fmt_baid64(f)
+    }
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug, Display, Error)]
@@ -349,19 +371,25 @@ impl DisplayBaid64<6> for Fingerprint {
     const EMBED_CHECKSUM: bool = false;
     const MNEMONIC: bool = false;
 
-    fn to_baid64_payload(&self) -> [u8; 6] { self.0 }
+    fn to_baid64_payload(&self) -> [u8; 6] {
+        self.0
+    }
 }
 
 impl FromBaid64Str<6> for Fingerprint {}
 
 impl Display for Fingerprint {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result { self.fmt_baid64(f) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        self.fmt_baid64(f)
+    }
 }
 
 impl FromStr for Fingerprint {
     type Err = Baid64ParseError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> { Self::from_baid64_str(s) }
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::from_baid64_str(s)
+    }
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]

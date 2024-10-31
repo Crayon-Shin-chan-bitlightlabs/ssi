@@ -31,19 +31,27 @@ use crate::{Algo, Chain, InvalidPubkey, InvalidSig, SsiPub, SsiSig};
 pub struct Ed25519Secret(pub(crate) SecretKey);
 
 impl Ord for Ed25519Secret {
-    fn cmp(&self, other: &Self) -> Ordering { self.0.as_slice().cmp(other.0.as_slice()) }
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.0.as_slice().cmp(other.0.as_slice())
+    }
 }
 
 impl PartialOrd for Ed25519Secret {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> { Some(self.cmp(other)) }
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl Hash for Ed25519Secret {
-    fn hash<H: Hasher>(&self, state: &mut H) { self.0.as_slice().hash(state) }
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.0.as_slice().hash(state)
+    }
 }
 
 impl From<Ed25519Secret> for [u8; 64] {
-    fn from(ssi: Ed25519Secret) -> Self { *ssi.0.deref() }
+    fn from(ssi: Ed25519Secret) -> Self {
+        *ssi.0.deref()
+    }
 }
 
 impl From<[u8; 64]> for Ed25519Secret {
@@ -100,5 +108,7 @@ impl TryFrom<SsiPub> for PublicKey {
 }
 
 impl SsiPub {
-    pub fn from_ed25519(key: PublicKey) -> Self { Self::from(*key) }
+    pub fn from_ed25519(key: PublicKey) -> Self {
+        Self::from(*key)
+    }
 }

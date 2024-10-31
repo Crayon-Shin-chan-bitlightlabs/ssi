@@ -25,7 +25,7 @@ extern crate amplify;
 extern crate clap;
 
 use std::collections::BTreeSet;
-use std::io::{stdin, Read};
+use std::io::{Read, stdin};
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::{fs, io};
@@ -118,26 +118,21 @@ pub enum Command {
         /// Identities which must be able to decrypt
         #[clap(short, long, required = true)]
         receiver: Vec<SsiQuery>,
-
         /// Text message to encrypt
         #[clap(short, long, conflicts_with = "file")]
         text: Option<String>,
-
         /// File to encrypt
         #[clap(short, long)]
         file: Option<PathBuf>,
     },
-
     /// Decrypt a message using one of your private keys
     Decrypt {
         /// Private key to use for decryption
         #[clap(short, long)]
         key: Option<SsiQuery>,
-
         /// Text message to decrypt
         #[clap(short, long, conflicts_with = "file")]
         text: Option<String>,
-
         /// File to decrypt
         #[clap(short, long)]
         file: Option<PathBuf>,
@@ -286,7 +281,6 @@ fn exec(command: Command) -> Result<(), CliError> {
                 println!("{cert}");
             }
         }
-
         Command::Verify { signature } => {
             eprint!("Verifying signature for message digest {} ... ", signature.msg);
             let pk = runtime

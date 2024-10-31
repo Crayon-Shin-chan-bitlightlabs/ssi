@@ -26,7 +26,7 @@ use std::str::{FromStr, Utf8Error};
 use baid64::Baid64ParseError;
 use chrono::{DateTime, Utc};
 use fluent_uri::Uri;
-use percent_encoding::{percent_decode_str, utf8_percent_encode, AsciiSet, CONTROLS};
+use percent_encoding::{AsciiSet, CONTROLS, percent_decode_str, utf8_percent_encode};
 use sha2::{Digest, Sha256};
 
 use crate::{InvalidSig, SsiPub, SsiSecret, SsiSig};
@@ -214,7 +214,7 @@ impl Display for Ssi {
 
         for uid in &self.uids {
             let uid = uid.to_string().replace(['<', '>'], "");
-            write!(f, "{sep}uid={}", utf8_percent_encode(&uid, SET).to_string().replace(' ', "+"), )?;
+            write!(f, "{sep}uid={}", utf8_percent_encode(&uid, SET).to_string().replace(' ', "+"),)?;
             sep = '&';
         }
 

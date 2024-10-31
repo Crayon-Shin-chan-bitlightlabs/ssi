@@ -22,8 +22,9 @@
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 
+use baid64::DisplayBaid64;
 use secp256k1::schnorr::Signature;
-use secp256k1::{Keypair, Message, SecretKey, XOnlyPublicKey, SECP256K1};
+use secp256k1::{Keypair, Message, SECP256K1, SecretKey, XOnlyPublicKey};
 
 use crate::{Algo, Chain, InvalidPubkey, InvalidSig, SsiPub, SsiSig};
 
@@ -81,10 +82,11 @@ impl Bip340Secret {
 
 impl SsiPub {
     pub fn verify_bip360(self, msg: [u8; 32], sig: SsiSig) -> Result<(), InvalidSig> {
-        let sig = Signature::from_slice(sig.as_slice()).map_err(|_| InvalidSig::InvalidData)?;
+        let sig = Signature::from_byte_array(sig.to_baid64_payload());
         let msg = Message::from_digest(msg);
         let pk = XOnlyPublicKey::try_from(self)?;
-        sig.verify(msg.as_ref(), &pk).map_err(|_| InvalidSig::InvalidSig)
+        sig.verify(msg.as_ref(), &pk)
+            .map_err(|_| InvalidSig::InvalidSig)
     }
 }
 

@@ -33,6 +33,7 @@ use base64::engine::general_purpose::NO_PAD;
 use base64::engine::GeneralPurpose;
 use base64::Engine;
 use chrono::{DateTime, Utc};
+use ec25519::{KeyPair, Seed};
 use sha2::{Digest, Sha256};
 
 use crate::{
@@ -68,8 +69,13 @@ impl EncryptedSecret {
     pub fn reveal(&self, passwd: impl AsRef<str>) -> Result<SsiSecret, RevealError> {
         let sk = decrypt(&self.key, self.nonce, passwd.as_ref())?;
         match self.algo {
-            Algo::Ed25519 => Ok(ec25519::SecretKey::from_slice(&sk)?.into()),
-            Algo::Bip340 => Ok(secp256k1::SecretKey::from_slice(&sk)?.into()),
+            Algo::Ed25519 => Ok(ec25519::SecretKey::from_slice(
+                KeyPair::from_seed(Seed::new(sk.try_into().unwrap())).as_slice(),
+            )?
+            .into()),
+            Algo::Bip340 => {
+                Ok(secp256k1::SecretKey::from_byte_array(&sk.try_into().unwrap())?.into())
+            }
             Algo::Other(algo) => Err(RevealError::Unsupported(algo)),
         }
     }
@@ -179,14 +185,12 @@ impl SsiSecret {
         for _ in 0..threads {
             let tx = tx.clone();
             let prefix = prefix.to_owned();
-            std::thread::spawn(move || {
-                loop {
-                    let sk = Self::new(algo, chain);
-                    let pk = sk.to_public();
-                    let start = format!("ssi:{prefix}");
-                    if pk.to_string().starts_with(&start) {
-                        tx.send(sk).expect("unable to send key");
-                    }
+            std::thread::spawn(move || loop {
+                let sk = Self::new(algo, chain);
+                let pk = sk.to_public();
+                let start = format!("ssi:{prefix}");
+                if pk.to_string().starts_with(&start) {
+                    tx.send(sk).expect("unable to send key");
                 }
             });
         }
@@ -227,13 +231,15 @@ impl SsiSecret {
     pub fn secret_bytes(&self) -> [u8; 32] {
         match self {
             SsiSecret::Bip340(sk) => sk.0.secret_bytes(),
-            SsiSecret::Ed25519(sk) => sk.0.seed().scalar(),
+            SsiSecret::Ed25519(sk) => *sk.0.seed(),
         }
     }
 }
 
 impl From<SsiSecret> for SsiPub {
-    fn from(sk: SsiSecret) -> Self { sk.to_public() }
+    fn from(sk: SsiSecret) -> Self {
+        sk.to_public()
+    }
 }
 
 #[derive(Clone, Eq, PartialEq, Display)]
